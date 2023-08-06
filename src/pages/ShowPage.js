@@ -1,9 +1,8 @@
-import { useParams } from 'react-router-dom'
+import { useParams,useHistory, Link } from 'react-router-dom'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 
 import LoadingSpinner from '../components/LoadingSpinner'
-import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 
 const ShowPage = () => {
   const { id } = useParams()
@@ -20,13 +19,31 @@ const ShowPage = () => {
 
   useEffect(()=>{getPost(id)},[id])
 
+  const printDate = (timestamp) => {
+    return new Date(timestamp).toLocaleString();
+  }
+
   if (loading) {
     return <LoadingSpinner/>
   }
 
   return (
     <div>
-      <h1>{post.title}</h1>
+      <div className='d-flex'>
+        <h1 className='flex-grow-1'>{post.title}</h1>
+        <div>
+          <Link 
+            key={id}
+            to={`/blogs/${id}/edit`}
+            className='btn btn-primary'>
+            Edit
+          </Link>
+        </div>
+      </div>
+      <small className='text-muted'>
+        Created At {printDate(post.createdAt)}
+      </small>
+      <hr></hr>
       <p>{post.body}</p>
     </div>
   )

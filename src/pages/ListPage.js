@@ -44,13 +44,13 @@ const ListPage = () => {
       return (<div>No Blog Post Exist</div>)
     }
 
-    return posts.map(post => {
+    return posts.filter(post=>post.publish).map(post => {
       return (
       <Card
         key={post.id} 
         title={post.title} 
         onClick={()=> history.push(`/blogs/${post.id}`) }>
-       <div>
+        <div>
           <button 
             className='btn btn-danger btn-sm'
             onClick={(e) => deleteBlog(e,post.id)}
