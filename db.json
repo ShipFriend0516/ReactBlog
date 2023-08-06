@@ -1,0 +1,19 @@
+{
+  "posts": [
+    {
+      "title": "New Blog",
+      "body": "wow!",
+      "id": 1
+    },
+    {
+      "title": "새로운 글",
+      "body": "새로운글",
+      "id": 2
+    },
+    {
+      "title": "What a Wonderful Site!",
+      "body": "We open this site!",
+      "id": 3
+    }
+  ]
+}
