@@ -41,6 +41,27 @@
       "publish": true,
       "createdAt": 1691322591517,
       "id": 9
+    },
+    {
+      "title": "A Whole new Post",
+      "body": "Hello Guys, It's Oracion!\n\nToday We're going to play the games name with 'Battleground', after playing this game, i will leave review post!",
+      "publish": true,
+      "createdAt": 1691396086767,
+      "id": 10
+    },
+    {
+      "title": "비공개",
+      "body": "ㅇㅇ",
+      "publish": false,
+      "createdAt": 1691397940206,
+      "id": 11
+    },
+    {
+      "title": "ddd",
+      "body": "ddd",
+      "publish": true,
+      "createdAt": 1691401583000,
+      "id": 12
     }
   ]
 }
