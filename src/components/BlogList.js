@@ -1,13 +1,11 @@
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useHistory } from 'react-router-dom'
-
+import { useHistory, useLocation } from 'react-router-dom'
 import Card from '../components/Card'
 import LoadingSpinner from '../components/LoadingSpinner';
 import Pagination from './Pagination';
 import PropTypes, { number } from 'prop-types'
-import { useLocation } from 'react-router-dom';
 
 const BlogList = ({ isAdmin }) => {
   const history = useHistory();
@@ -20,7 +18,10 @@ const BlogList = ({ isAdmin }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [numberOfPosts, setNumberOfPosts] = useState(0);
   const [numberOfPages, setNumberOfPages] = useState(0);
-  const limit = 1;
+  const limit = 5;
+
+  // Search Tab
+  const [searchText, setSearchText] = useState('');
 
   useEffect(()=> {
     setNumberOfPages(Math.ceil(numberOfPosts / limit))
@@ -31,12 +32,13 @@ const BlogList = ({ isAdmin }) => {
     getPosts(page);
   }
 
-  const getPosts = (page = 1) => {
+  const getPosts = useCallback((page = 1) => {
     let params = {
       _page: page,
       _limit: limit,
       _sort: 'id',
       _order: 'desc',
+      title_like: searchText
     }
 
     if(!isAdmin) {
@@ -50,10 +52,11 @@ const BlogList = ({ isAdmin }) => {
       setPosts(res.data);
       setLoading(false)
     })
-  }
+  }, [isAdmin, searchText])
 
   // 리렌더링이 되어도 한 번만 실행이 되는 함수 = UseEffect
   useEffect(()=> {
+
     setCurrentPage(parseInt(pageParam) || 1);
     getPosts(parseInt(pageParam) || 1);
   }, [pageParam])
@@ -94,17 +97,33 @@ const BlogList = ({ isAdmin }) => {
     )
   }
 
-  if(posts.length === 0) {
-    return (<div>No Blog Post Exist</div>)
+
+  const onSearch = (e) => {
+    if(e.key === 'Enter') {
+      getPosts(1);
+    }
   }
 
   return (
     <div>
-      {renderBlogList()}
-      {numberOfPages > 1 && <Pagination 
-        currentPage={currentPage}
-        numberOfPages={numberOfPages}
-        onClick={onClickPageButton}/>}
+      <input 
+        className='form-control'
+        type='text'
+        placeholder='Search'
+        value={searchText}
+        onChange={(e)=> setSearchText(e.target.value)}
+        onKeyUp={onSearch}/>
+      <hr/>
+      {posts.length === 0 
+        ? <div>No Blog Post Exist</div> 
+        : <>
+        {renderBlogList()}
+        {numberOfPages > 1 && <Pagination 
+          currentPage={currentPage}
+          numberOfPages={numberOfPages}
+          onClick={onClickPageButton}/>}
+        </>}
+      
     </div>
   )
 }
