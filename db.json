@@ -50,18 +50,53 @@
       "id": 10
     },
     {
-      "title": "비공개",
-      "body": "ㅇㅇ",
-      "publish": false,
-      "createdAt": 1691397940206,
-      "id": 11
-    },
-    {
       "title": "ddd",
       "body": "ddd",
       "publish": true,
       "createdAt": 1691401583000,
       "id": 12
+    },
+    {
+      "title": "test1",
+      "body": "t",
+      "publish": true,
+      "createdAt": 1691489785743,
+      "id": 13
+    },
+    {
+      "title": "ㅇㅇ",
+      "body": "ㅇㅇ",
+      "publish": true,
+      "createdAt": 1691499809090,
+      "id": 14
+    },
+    {
+      "title": "뉴",
+      "body": "ㅇㅇ",
+      "publish": true,
+      "createdAt": 1691499830805,
+      "id": 15
+    },
+    {
+      "title": "n",
+      "body": "m",
+      "publish": true,
+      "createdAt": 1691501820439,
+      "id": 16
+    },
+    {
+      "title": "ddd",
+      "body": "ddd",
+      "publish": true,
+      "createdAt": 1691502287343,
+      "id": 17
+    },
+    {
+      "title": "dd",
+      "body": "dd",
+      "publish": true,
+      "createdAt": 1691502374572,
+      "id": 18
     }
   ]
 }

@@ -2,10 +2,13 @@ import axios from 'axios';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useHistory, useLocation } from 'react-router-dom'
+import PropTypes, { number } from 'prop-types'
+import useToast from '../hooks/toast';
+
 import Card from '../components/Card'
 import LoadingSpinner from '../components/LoadingSpinner';
 import Pagination from './Pagination';
-import PropTypes, { number } from 'prop-types'
+import Toast from './Toast';
 
 const BlogList = ({ isAdmin }) => {
   const history = useHistory();
@@ -23,12 +26,16 @@ const BlogList = ({ isAdmin }) => {
   // Search Tab
   const [searchText, setSearchText] = useState('');
 
+  // Toast Tab
+  const [toasts, addToast, deleteToast] = useToast()
+
   useEffect(()=> {
     setNumberOfPages(Math.ceil(numberOfPosts / limit))
   }, [numberOfPosts])
 
   const onClickPageButton = (page) => {
     history.push(`${location.pathname}?page=${page}`)
+    setCurrentPage(page);
     getPosts(page);
   }
 
@@ -53,19 +60,25 @@ const BlogList = ({ isAdmin }) => {
       setLoading(false)
     })
   }, [isAdmin, searchText])
+  
 
   // 리렌더링이 되어도 한 번만 실행이 되는 함수 = UseEffect
   useEffect(()=> {
-
     setCurrentPage(parseInt(pageParam) || 1);
-    getPosts(parseInt(pageParam) || 1);
-  }, [pageParam])
+    getPosts(parseInt(pageParam) || 1)
+
+  }, []);
+
 
   const deleteBlog = (e, id) => {
       e.stopPropagation()
       axios.delete(`http://localhost:3001/posts/${id}`)
       .then(()=> {
         setPosts(prevPosts => prevPosts.filter(post =>  post.id !== id))
+        addToast({
+          text: "Successfully deleted",
+          type: "success"
+        })
       })
   }
 
@@ -100,12 +113,17 @@ const BlogList = ({ isAdmin }) => {
 
   const onSearch = (e) => {
     if(e.key === 'Enter') {
+      history.push(`${location.pathname}?page=1`)
+      setCurrentPage(1);
       getPosts(1);
     }
   }
 
   return (
     <div>
+      <Toast 
+        toasts={toasts}
+        deleteToast={deleteToast}/>
       <input 
         className='form-control'
         type='text'

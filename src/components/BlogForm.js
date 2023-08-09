@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { bool } from 'prop-types';
 import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
 
-const BlogForm = ({editing}) => {
+const BlogForm = ({editing, addToast}) => {
   const history = useHistory();
   const { id } = useParams();
   const [title, setTitle] = useState('');
@@ -13,6 +13,8 @@ const BlogForm = ({editing}) => {
   const [originalBody, setOriginalBody] = useState('');
   const [publish, setPublish] = useState(false);
   const [originalPublish, setOriginalPublish] = useState('');
+  const [titleError, setTitleError] = useState(false)
+  const [bodyError, setBodyError] = useState(false)
 
 
   const isEdited = () => {
@@ -27,25 +29,55 @@ const BlogForm = ({editing}) => {
     }
   }
 
-  const onSummit = () => {
-    if(editing) {
-      axios.patch(`http://localhost:3001/posts/${id}`, {
-        title,
-        body,
-        publish,
-      }).then(() => {
-        history.push(`/blogs/${id}`)
-      })
-    } else {
-      axios.post('http://localhost:3001/posts', {
-        title,
-        body,
-        publish,
-        createdAt: Date.now()
-      }).then(() => {
-        history.push('/admin')
-      })
+  const validateForm = () => {
+    let validated = true;
+
+    if(title === '') {
+      setTitleError(true);
+      validated = false;
+    } 
+
+    if(body === '') {
+      setBodyError(true);
+      validated = false;
     }
+
+    return validated;
+  }
+
+  
+
+  const onSummit = () => {
+    setTitleError(false)
+    setBodyError(false)
+
+    if(validateForm()) {
+
+      if(editing) {
+        // Edit 버튼 클릭
+        axios.patch(`http://localhost:3001/posts/${id}`, {
+          title,
+          body,
+          publish,
+        }).then(() => {
+          history.push(`/blogs/${id}`)
+        })
+      } else {
+        // Post 버튼 클릭
+        axios.post('http://localhost:3001/posts', {
+          title,
+          body,
+          publish,
+          createdAt: Date.now()
+        }).then(() => {
+          addToast({
+            text: "Successfully created",
+            type: 'success'
+          })
+          history.push('/admin')
+        })
+      }
+    } 
   }
 
   const onChangePublish = (e) => {
@@ -72,19 +104,25 @@ const BlogForm = ({editing}) => {
       <div className='mb-3'>
         <label className="form-label mt-1">Title</label>
         <input 
-          className='form-control'
+          className={`form-control ${titleError && 'border-danger'}`}
           value={title}
           onChange={(event)=> setTitle(event.target.value)}
         />
+        {titleError && <div className='text-danger'>
+          Title is required.
+        </div>}
       </div>
       <div className='mb-3'>
         <label className="form-label">Body</label>
         <textarea 
-          className='form-control'
+          className={`form-control ${bodyError && 'border-danger'}`}
           value={body}
           rows={18}
           onChange={(event)=> setBody(event.target.value)}
         />
+        {bodyError && <div className='text-danger'>
+          Body is required.
+        </div>}
       </div>
       <div className='form-check mb-3'>
         <label className='form-check-label'>
