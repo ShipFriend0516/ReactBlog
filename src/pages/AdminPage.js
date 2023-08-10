@@ -8,7 +8,7 @@ const AdminPage = () => {
       <div className='d-flex justify-content-between'>
         <h1 className='mb-3'>Admin</h1>
         <div>
-          <Link to="./blogs/create" className="btn btn-success">
+          <Link to="/blogs/create" className="btn btn-success">
             Create New
           </Link>
         </div>

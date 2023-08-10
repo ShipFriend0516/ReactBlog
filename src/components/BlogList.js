@@ -1,17 +1,15 @@
 import axios from 'axios';
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import PropTypes, { number } from 'prop-types'
 import useToast from '../hooks/toast';
 
 import Card from '../components/Card'
 import LoadingSpinner from '../components/LoadingSpinner';
 import Pagination from './Pagination';
-import Toast from './Toast';
 
 const BlogList = ({ isAdmin }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const pageParam = params.get('page')
@@ -27,14 +25,17 @@ const BlogList = ({ isAdmin }) => {
   const [searchText, setSearchText] = useState('');
 
   // Toast Tab
-  const [toasts, addToast, deleteToast] = useToast()
+  const { addToast } = useToast()
+
+  // Error Handling
+  const [error, setError] = useState('')
 
   useEffect(()=> {
     setNumberOfPages(Math.ceil(numberOfPosts / limit))
   }, [numberOfPosts])
 
   const onClickPageButton = (page) => {
-    history.push(`${location.pathname}?page=${page}`)
+    navigate(`${location.pathname}?page=${page}`)
     setCurrentPage(page);
     getPosts(page);
   }
@@ -58,6 +59,13 @@ const BlogList = ({ isAdmin }) => {
       setNumberOfPosts(res.headers['x-total-count'])
       setPosts(res.data);
       setLoading(false)
+    }).catch(e=> {
+      setLoading(false)
+      setError('Something went wrong in database!')
+      addToast({
+        text: "Something went wrong",
+        type: 'danger'
+      })
     })
   }, [isAdmin, searchText])
   
@@ -74,10 +82,17 @@ const BlogList = ({ isAdmin }) => {
       e.stopPropagation()
       axios.delete(`http://localhost:3001/posts/${id}`)
       .then(()=> {
-        setPosts(prevPosts => prevPosts.filter(post =>  post.id !== id))
+        // setPosts(prevPosts => prevPosts.filter(post =>  post.id !== id))
+        getPosts(currentPage)
         addToast({
           text: "Successfully deleted",
           type: "success"
+        })
+      }).catch(e=> {
+        setLoading(false)
+        addToast({
+          text: "The blog could not be deleted.",
+          type: 'danger'
         })
       })
   }
@@ -88,7 +103,7 @@ const BlogList = ({ isAdmin }) => {
         <Card
           key={post.id} 
           title={post.title} 
-          onClick={()=> history.push(`/blogs/${post.id}`) }>
+          onClick={()=> navigate(`/blogs/${post.id}`) }>
           { isAdmin ? <div>
             <button 
               className='btn btn-danger btn-sm'
@@ -113,17 +128,18 @@ const BlogList = ({ isAdmin }) => {
 
   const onSearch = (e) => {
     if(e.key === 'Enter') {
-      history.push(`${location.pathname}?page=1`)
+      navigate(`${location.pathname}?page=1`)
       setCurrentPage(1);
       getPosts(1);
     }
   }
 
+  if(error) {
+    return <div>{error}</div>
+  }
+
   return (
     <div>
-      <Toast 
-        toasts={toasts}
-        deleteToast={deleteToast}/>
       <input 
         className='form-control'
         type='text'

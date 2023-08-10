@@ -1,6 +1,6 @@
 import {
   BrowserRouter as Router,
-  Switch,
+  Routes,
   Route
 } from 'react-router-dom';
 
@@ -9,30 +9,48 @@ import NavBar from './components/NavBar'
 import routes from './routes'
 import Toast from './components/Toast';
 import useToast from './hooks/toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToast, removeToast } from './store/toastSlice';
+import ProtectedRoute from './ProtectedRoute';
+import { useEffect, useState } from 'react';
+import { login, logout } from './store/authSlice' 
+import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
-  const [toasts, addToast, deleteToast] = useToast();
+  const toasts = useSelector(state => state.toast.toasts)
+
+  const [loading, setLoading] = useState(true);
+  
+  const dispatch = useDispatch();
+  useEffect(()=> {
+    if(localStorage.getItem('isLoggedIn')) {
+      dispatch(login());
+    }
+    setLoading(false)
+  },[])
+
+  if(loading) {
+    return <LoadingSpinner/>
+  }
 
   return (
     <Router>
       <NavBar />
       <Toast
         toasts={toasts}
-        deleteToast={deleteToast}
+        deleteToast={removeToast}
       />
       <div className='container mt-3'>
-        <Switch>
+        <Routes>
           { routes.map((route)=> {
-              const Component = route.component;
-              return <Route exact 
+              return <Route 
                 key={route.path} 
                 path={route.path} 
-                // component={route.component}
-                >
-                  <Component addToast={addToast}/>
-                </Route>
+                element={route.auth ? <ProtectedRoute exact
+                  element={route.element}
+                  /> : route.element}/>
           }) }
-        </Switch>
+        </Routes>
       </div>
     </Router>
     

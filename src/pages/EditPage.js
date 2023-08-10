@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom/cjs/react-router-dom.min'
+import { useParams } from 'react-router-dom'
 
 // Components Here~!
 import BlogForm from '../components/BlogForm';

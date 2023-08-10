@@ -4,31 +4,39 @@ import EditPage from './pages/EditPage';
 import ListPage from './pages/ListPage';
 import ShowPage from './pages/ShowPage';
 import AdminPage from './pages/AdminPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 const routes = [
   {
     path: '/',
-    component: HomePage
+    element: <HomePage/>
   },
   {
     path: '/blogs',
-    component: ListPage
+    element: <ListPage/>
   },
   {
     path: '/blogs/create',
-    component: CreatePage
+    element: <CreatePage/>,
+    auth: true,
   },
   {
     path: '/blogs/:id/edit',
-    component: EditPage
+    element: <EditPage/>,
+    auth: true,
   },
   {
     path: '/blogs/:id',
-    component: ShowPage
+    element: <ShowPage/>
   },
   {
     path: '/admin',
-    component: AdminPage
+    element: <AdminPage/>,
+    auth: true,
+  },
+  {
+    path: '*',
+    element: <NotFoundPage/>,
   }
 ]
 

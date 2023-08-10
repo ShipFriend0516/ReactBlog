@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios'
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { bool } from 'prop-types';
-import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
+import { useParams } from 'react-router-dom';
+import useToast from '../hooks/toast';
+import LoadingSpinner from './LoadingSpinner';
 
-const BlogForm = ({editing, addToast}) => {
-  const history = useHistory();
+const BlogForm = ({editing}) => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [title, setTitle] = useState('');
   const [originalTitle, setOriginalTitle] = useState('');
@@ -15,6 +17,9 @@ const BlogForm = ({editing, addToast}) => {
   const [originalPublish, setOriginalPublish] = useState('');
   const [titleError, setTitleError] = useState(false)
   const [bodyError, setBodyError] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const { addToast } = useToast()
+  const [error, setError] = useState('')
 
 
   const isEdited = () => {
@@ -23,9 +28,9 @@ const BlogForm = ({editing, addToast}) => {
 
   const goBack = () => {
     if(editing) {
-      history.push(`/blogs/${id}`)
+      navigate(`/blogs/${id}`)
     } else {
-      history.push('/blogs')
+      navigate('/blogs')
     }
   }
 
@@ -60,7 +65,12 @@ const BlogForm = ({editing, addToast}) => {
           body,
           publish,
         }).then(() => {
-          history.push(`/blogs/${id}`)
+          navigate(`/blogs/${id}`)
+        }).catch(e=>{
+            addToast({
+              type: 'danger',
+              text: 'We could not update blog'
+            })
         })
       } else {
         // Post 버튼 클릭
@@ -74,7 +84,12 @@ const BlogForm = ({editing, addToast}) => {
             text: "Successfully created",
             type: 'success'
           })
-          history.push('/admin')
+          navigate('/admin')
+        }).catch(e=>{
+            addToast({
+              type: 'danger',
+              text: 'We could not create blog'
+            })
         })
       }
     } 
@@ -93,10 +108,28 @@ const BlogForm = ({editing, addToast}) => {
         setOriginalTitle(res.data.title);
         setOriginalBody(res.data.body);
         setOriginalPublish(res.data.publish);
-
+        setLoading(false)
+      }).catch(e=> {
+        setError('something went wrong in db')
+        addToast({
+          type: 'danger',
+          text: "We could not load the blog from db"
+        })
+        setLoading(false);
       })
+    } else {
+      setLoading(false);
+
     }
   }, [id, editing])
+
+  if(loading) {
+    return <LoadingSpinner/>
+  }
+
+  if(error) {
+    return <div>{error}</div>
+  }
 
   return (
     <div className="mt-3">
